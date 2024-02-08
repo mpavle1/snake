@@ -9,9 +9,15 @@ pub struct Snake {
 }
 
 impl Snake {
-    pub fn update(&mut self) {
+    pub fn update(&mut self, food_position: Position) {
         self.body.push_front(self.head);
         self.body.pop_back();
+
+        // ako su im iste X ose a razlitice Y, treba da se rotira glava ka gore ili dole
+        // ako su im iste Y ose a razlitice X, treba da se rotira glava ka levo ili desno
+        // ako je oboje isto, treba odluciti sa jednim od 2 (x/Y)
+
+        // ubaciti i da prati gde je njegovo telo u jednom momentu
 
         match self.direction {
             Directions::UP => {
