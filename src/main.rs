@@ -1,21 +1,37 @@
-use std::thread::sleep;
 use core::time::Duration;
 
-pub const SLEEP_DURATION: Duration  = Duration::from_millis(500);
+use piston_window::*;
+use piston_window::{PistonWindow, WindowSettings};
 
+pub const SLEEP_DURATION: Duration = Duration::from_millis(500);
+
+mod common;
 mod game;
 mod snake;
-mod common;
 
 fn main() {
+    let size = [
+        common::BLOCK_SIZE as u32 * common::WIDTH,
+        common::BLOCK_SIZE as u32 * common::HEIGHT,
+    ];
     let mut game = game::Game::new();
+    let mut window: PistonWindow = WindowSettings::new("Snake", size)
+        .resizable(true)
+        .build()
+        .unwrap();
 
-    loop {
-        game.update();
-        game.render();
+    while let Some(event) = window.next() {
+        if let Some(Button::Keyboard(key)) = event.press_args() {
+            game.update_snake_direction(key);
+        }
 
-        sleep(SLEEP_DURATION);
-        
-        print!("\x1B[2J\x1B[1;1H");
+        window.draw_2d(&event, |ctx, g, _| {
+            clear(common::BACKGROUND, g);
+            game.draw(ctx, g);
+        });
+
+        event.update(|arg| {
+            game.update(arg.dt);
+        });
     }
 }
